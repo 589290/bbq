@@ -1,14 +1,10 @@
 # BBQ ~ Big Bang Quickdev
 
-<img src="https://repo1.dso.mil/gmiernicki/bbq/-/raw/main/assets/bbq192.png">
-  
-#  
-
 # Installation
 
 ### Clone repo to ~/bbq
 ```
-cd ~ && git clone https://repo1.dso.mil/gmiernicki/bbq.git
+cd ~ && git clone https://github.com/589290/bbq.git
 ```
 ### Add Iron Bank credentials, BBQ kube-config, BBQ path, and some useful aliases to your to ~/.bashrc
 ```
