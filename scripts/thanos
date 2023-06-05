@@ -1,0 +1,9 @@
+#!/bin/bash
+
+helm upgrade \
+    --install thanos ~/thanos/chart \
+    --namespace monitoring \
+    --set image.registry=registry1.dso.mil \
+    --set image.repository=ironbank/opensource/thanos/thanos \
+    --set image.tag=v0.29.0 \
+    --values ~/bbq/overrides/thanos.yaml

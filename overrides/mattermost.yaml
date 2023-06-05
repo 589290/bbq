@@ -1,0 +1,73 @@
+git:
+  tag: ""
+  branch: "1380-mattermost-packages-update-to-meet-standards"
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+networkPolicies:
+  enabled: false
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: true
+
+twistlock:
+  enabled: false
+
+sso:
+  oidc:
+    host: login.dso.mil
+    realm: baby-yoda
+  client_secret: ""
+
+monitoring:
+  enabled: false
+
+addons:
+
+  minioOperator:
+    enabled: true
+
+  minio:
+    enabled: true
+    values:
+      tenants:
+        pools:
+        - servers: 2
+          volumesPerServer: 4
+          size: 256Mi
+          resources:
+            requests:
+              cpu: 250m
+              memory: 2Gi
+            limits:
+              cpu: 250m
+              memory: 2Gi
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+            runAsNonRoot: true
+
+  mattermostoperator:
+    enabled: true
+
+  mattermost:
+    enabled: true

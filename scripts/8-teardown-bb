@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export KUBECONFIG=~/.kube/bbq-config
+
+echo '⏳ helm deleting bigbang release... '
+echo
+
+helm delete bigbang -n bigbang
+
+echo
+echo '🤔 it may be necessary to cleanup hung namespaces by running: '
+echo
+echo '~/bigbang/scripts/remove-ns-finalizer.sh name-of-namespace'
+echo

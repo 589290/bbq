@@ -1,0 +1,96 @@
+domain: bigbang.dev
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+networkPolicies:
+  enabled: true
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+  values:
+    replicas: 1
+    # emitAdmissionEvents: true
+    # logDenies: true
+    # emitAuditEvents: true
+
+istiooperator:
+  enabled: true
+
+istio:
+  enabled: true
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: false
+
+logging:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+twistlock:
+  enabled: false
+
+sso:
+  oidc:
+    # host: keycloak.bigbang.dev
+    host: login.dso.mil
+    realm: baby-yoda
+  client_secret: ""
+
+addons:
+  minioOperator:
+    enabled: false
+
+  minio:
+    enabled: false
+
+  gitlabRunner:
+    enabled: true
+
+  gitlab:
+    enabled: true
+    hostnames:
+      gitlab: gitlab
+      registry: registry
+    sso:
+      enabled: true
+      label: "Platform One SSO"
+      client_id: "platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-gitlab"
+      client_secret: ""
+
+    smtp:
+      password: "not-a-real-password"
+
+    values:
+      gitlab:
+        webservice:
+          minReplicas: 1
+          maxReplicas: 1
+          helmTests:
+            enabled: false
+        gitlab-shell:
+          minReplicas: 1
+          maxReplicas: 1
+        sidekiq:
+          minReplicas: 1
+          maxReplicas: 1
+      registry:
+        hpa:
+          minReplicas: 1
+          maxReplicas: 1
+      global:
+        appConfig:
+          defaultCanCreateGroup: true

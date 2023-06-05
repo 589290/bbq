@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo
+echo 'usage: '
+echo '  reflux helm-release-name namespace'
+echo
+
+args=("$@")
+flux suspend hr ${args[0]} -n ${args[1]} && \
+flux resume hr ${args[0]} -n ${args[1]}
+
+#~/bigbang/scripts/sync.sh

@@ -1,0 +1,43 @@
+loki:
+  enabled: true
+#  git:
+#    tag: ""
+#    branch: ""
+#  strategy: scalable
+  values:
+    global:
+      createGlobalConfig: true
+      loki: 
+        existingSecretForConfig: "loki-config"
+
+kiali:
+  enabled: true
+  values:
+    cr:
+      spec:
+        auth:
+          strategy: "anonymous"
+
+networkPolicies:
+  enabled: false
+
+jaeger:
+  enabled: false
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+twistlock:
+  enabled: false
+
+promtail:
+  enabled: true

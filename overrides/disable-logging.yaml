@@ -1,0 +1,11 @@
+clusterAuditor:
+  enabled: false
+
+logging:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false

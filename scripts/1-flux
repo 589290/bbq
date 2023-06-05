@@ -1,0 +1,13 @@
+#!/bin/bash
+
+export KUBECONFIG=~/.kube/bbq-config
+set +o history
+echo $REGISTRY1_PASSWORD | docker login registry1.dso.mil --username $REGISTRY1_USERNAME --password-stdin
+set -o history
+
+echo '⏳ flux installing...'
+
+~/bigbang/scripts/install_flux.sh -u $REGISTRY1_USERNAME -p $REGISTRY1_PASSWORD
+kubectl get pods --namespace=flux-system
+
+echo '✅ flux deployed.'

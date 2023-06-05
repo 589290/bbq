@@ -1,0 +1,56 @@
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+networkPolicies:
+  enabled: false
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: false
+
+twistlock:
+  enabled: false
+
+sso:
+  oidc:
+    host: login.dso.mil
+    realm: baby-yoda
+  client_secret: ""
+
+monitoring:
+  enabled: true
+  values:
+    thanosRuler:
+      enabled: true
+    prometheusOperator:
+      clusterDomain: "cluster.local"
+    prometheus:
+      thanosService:
+        enabled: true
+      thanosServiceMonitor:
+        enabled: true
+      prometheusSpec:
+        replicas: 3
+        thanos:
+          baseImage: registry1.dso.mil/ironbank/opensource/thanos/thanos
+          version: v0.29.0
+          objectStorageConfig:
+            key: objstore.yml
+            name: thanos-objstore-secret
+
+addons:
+  minioOperator:
+    enabled: true
+

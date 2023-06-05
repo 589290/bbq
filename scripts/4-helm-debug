@@ -1,0 +1,30 @@
+#!/bin/bash
+
+export KUBECONFIG=~/.kube/bbq-config
+
+echo -n '⏳ removing any previous renders... '
+rm -f rendered.yaml rendered.err
+echo '✅'
+echo '⏳ rendering helm template...'
+ 
+helm upgrade \
+  --install bigbang ~/bigbang/chart \
+  --dry-run --debug \
+  --create-namespace \
+  --namespace bigbang \
+  --values ~/bigbang/chart/values.yaml \
+  --values ~/bigbang/chart/ingress-certs.yaml \
+  --values ~/bbq/overrides/ib_creds.yaml \
+  --values ~/bbq/overrides/twistlock.yaml 1> rendered.yaml 2> rendered.err
+
+
+
+# helm template ~/bigbang/chart \
+# >   --namespace bigbang \
+# >   --values ~/bigbang/chart/values.yaml \
+# >   --values ~/bigbang/chart/ingress-certs.yaml \
+# >   --values ~/bigbang/docs/assets/configs/example/dev-sso-values.yaml \
+# >   --values ~/bbq/overrides/ib_creds.yaml \
+# >   --values ~/bbq/overrides/monitoring.yaml | less
+
+echo '✅ templated to ~/rendered.yaml ~/rendered.err'

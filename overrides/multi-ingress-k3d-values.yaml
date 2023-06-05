@@ -1,0 +1,781 @@
+#aws ec2 associate-iam-instance-profile \
+#    --instance-id i-0bc1898f1a85e3d36 \
+#    --iam-instance-profile Name="InstanceOpsRole"
+
+domain: bigbang.dev
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+
+networkPolicies:
+  enabled: true
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+  values:
+    replicas: 1
+
+kyverno:
+  enabled: false
+
+kyvernopolicies:
+  enabled: false
+
+istiooperator:
+  enabled: true
+
+istio:
+  enabled: true
+
+  # git:
+  #   tag: null
+  #   branch: "25-multiingress-poc"
+
+  ingressGateways:
+    public-ingressgateway:
+      type: "LoadBalancer"
+      # nodePortBase: 30000
+
+    private-ingressgateway:
+      type: "LoadBalancer"
+      # nodePortBase: 30100
+
+    passthrough-ingressgateway:
+      type: "LoadBalancer"
+      # nodePortBase: 30200
+
+  gateways:
+    public:
+      ingressGateway: "public-ingressgateway"
+      hosts:
+      - "*.{{ .Values.domain }}"
+
+    private:
+      ingressGateway: "private-ingressgateway"
+      hosts:
+      - "*.{{ .Values.domain }}"
+      tls: # *.bigbang.dev
+        key: |
+          -----BEGIN PRIVATE KEY-----
+          MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQClaYFiPGoPBjqe
+          QrQ0Zx/o9qmfZbVmV6SAPOjFKwl1udm5b7Q+PhnSsMaZVzhVu1hRbvaZ39EQdRqY
+          bNJxsgUo888uCTTPJFzucUdb6fBAjWniP5qi8KvQ2THtxf4+N/krYA5a9bKe6btg
+          Za7iA9DbALr/DHetwv5Y65tzbVB06mtVnZ/fV9jhvE/L9NfssjLLcWe2DDU7g/r1
+          nSuEGI0OknqfX3Sx0leloBe3AtZUn2YgzTt0zyj4buP5dpKcGIH8CIFdTIwzcr4N
+          yjzpE/Sr/hJWxNVThkvkieaD7jsbj6Od6+xW7wp3b9RsyjC3uEFZVp2SxgbnlbuT
+          U90DzqIDAgMBAAECggEAao25W/fA9maz0gj0HqGjq6VhhR22qfOhMz6JT6G2mVCc
+          UVkEyeelKNTZSiQmVQu3C9YoIt1Lxoc5F6FaOwVLT6Mm/efOTfWFq8/rAOmE64Bt
+          CeKhEX9pnsKa6ClX6uqRpwBcnvmRE89K9gDqlAuTOdCRpQR5/8QRpmQ3ojZz0qu5
+          zUDFllcn/2DScmEA4C8wyg1+Jjln8x8J6fQ2ljn4hueY4/rr1bWMVl2IkcGNyUlV
+          Ahv2/vQS17PpZCfQuqAVwOvNIxN9FlUQe60V2AdbqnO+dvTEUfm2eo/HoJ9JU8O1
+          ISbdIC9MXjd9O1MNVqzOqOdsRU9ZlGd4GBdZ9Xsk2QKBgQDbLZeb4H7bIF+0Q+oc
+          uYUhR9Xu+o7iP1xU9YlGXklH5HM36owLHyCs0PUaIldP/pyVHXyJLEtPhMrrexf9
+          KkD5U7Vs489zk4JdOQ0BrVvCxxk02utYWdyc91IYWjFci7EI/vSYtciTT6G8ZRJt
+          QvXGGjGsfPbpEA83MAQJI1/xJwKBgQDBM4wpj4vQVuel4A6LPUQX3hp182U5onhB
+          eQ7XMSVRiq7a60fmtDmgO0auiTPR5jjeS9oS2G3pVBE2Hudz83ihoO9xjNvqoZAs
+          62JqRsEtaf6KTpZPf1wTHOQPxadLV5WKZRFmWTYnzl6NN19SzW5r6B7jjuhX1SFC
+          TNFuZfDZxQKBgBaHCR4sZN2A5lVQ5a8uIlDZYVO+zRDUEllpI0LoTf/lqzIEGYDL
+          IkCg+ZBGF1NRiCaLcVFoDBWQQIsTi9OplCQMRol6oMfwUWXjh0K03smWTTDxj171
+          XYeEpBt8qbYpZXjXO6y2gnchqC4E9W/lgf1qk9B2x6oMzIOPm9qUmDfhAoGAZh4o
+          547IB8bnifVzuoUXiMYMlmugBWaqyXCDN5rybrcu1OeniXmZO+gY5AgBK+DUDitp
+          iKx86+dTcZfEHrWB/WxjI1Ggq9PZsOR5kFL1qFtt/wyqxjo7IJ8UrIF8e4Y/tHbX
+          S5G73i5mK54o9EtBIif+q6jNhh9RBQo1aHTZaUECgYBLuMf/HDK+CfZSxiUSibuv
+          P5HEdh5Wyf3CcP+tnqdGlWTHTpJcyhwgXu9U4Jq/C4sCwKg+YNGdCC546VnQlk/+
+          ndcsIBupTiAuZ9XKgiIMnxmuhj0FZD6lJPalxTBgsHqPhAuWUTr33GUfIwsivBjq
+          fPQoxgpxHY/EjpvxG6v48Q==
+          -----END PRIVATE KEY-----
+        cert: |
+          -----BEGIN CERTIFICATE-----
+          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
+          0eT3gb+zaRn8ZMjJxO6JfjOLpWo=
+          -----END CERTIFICATE-----
+          -----BEGIN CERTIFICATE-----
+          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
+          nLRbwHOoq7hHwg==
+          -----END CERTIFICATE-----
+          -----BEGIN CERTIFICATE-----
+          MIIFYDCCBEigAwIBAgIQQAF3ITfU6UK47naqPGQKtzANBgkqhkiG9w0BAQsFADA/
+          MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT
+          DkRTVCBSb290IENBIFgzMB4XDTIxMDEyMDE5MTQwM1oXDTI0MDkzMDE4MTQwM1ow
+          TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+          cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwggIiMA0GCSqGSIb3DQEB
+          AQUAA4ICDwAwggIKAoICAQCt6CRz9BQ385ueK1coHIe+3LffOJCMbjzmV6B493XC
+          ov71am72AE8o295ohmxEk7axY/0UEmu/H9LqMZshftEzPLpI9d1537O4/xLxIZpL
+          wYqGcWlKZmZsj348cL+tKSIG8+TA5oCu4kuPt5l+lAOf00eXfJlII1PoOK5PCm+D
+          LtFJV4yAdLbaL9A4jXsDcCEbdfIwPPqPrt3aY6vrFk/CjhFLfs8L6P+1dy70sntK
+          4EwSJQxwjQMpoOFTJOwT2e4ZvxCzSow/iaNhUd6shweU9GNx7C7ib1uYgeGJXDR5
+          bHbvO5BieebbpJovJsXQEOEO3tkQjhb7t/eo98flAgeYjzYIlefiN5YNNnWe+w5y
+          sR2bvAP5SQXYgd0FtCrWQemsAXaVCg/Y39W9Eh81LygXbNKYwagJZHduRze6zqxZ
+          Xmidf3LWicUGQSk+WT7dJvUkyRGnWqNMQB9GoZm1pzpRboY7nn1ypxIFeFntPlF4
+          FQsDj43QLwWyPntKHEtzBRL8xurgUBN8Q5N0s8p0544fAQjQMNRbcTa0B7rBMDBc
+          SLeCO5imfWCKoqMpgsy6vYMEG6KDA0Gh1gXxG8K28Kh8hjtGqEgqiNx2mna/H2ql
+          PRmP6zjzZN7IKw0KKP/32+IVQtQi0Cdd4Xn+GOdwiK1O5tmLOsbdJ1Fu/7xk9TND
+          TwIDAQABo4IBRjCCAUIwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYw
+          SwYIKwYBBQUHAQEEPzA9MDsGCCsGAQUFBzAChi9odHRwOi8vYXBwcy5pZGVudHJ1
+          c3QuY29tL3Jvb3RzL2RzdHJvb3RjYXgzLnA3YzAfBgNVHSMEGDAWgBTEp7Gkeyxx
+          +tvhS5B1/8QVYIWJEDBUBgNVHSAETTBLMAgGBmeBDAECATA/BgsrBgEEAYLfEwEB
+          ATAwMC4GCCsGAQUFBwIBFiJodHRwOi8vY3BzLnJvb3QteDEubGV0c2VuY3J5cHQu
+          b3JnMDwGA1UdHwQ1MDMwMaAvoC2GK2h0dHA6Ly9jcmwuaWRlbnRydXN0LmNvbS9E
+          U1RST09UQ0FYM0NSTC5jcmwwHQYDVR0OBBYEFHm0WeZ7tuXkAXOACIjIGlj26Ztu
+          MA0GCSqGSIb3DQEBCwUAA4IBAQAKcwBslm7/DlLQrt2M51oGrS+o44+/yQoDFVDC
+          5WxCu2+b9LRPwkSICHXM6webFGJueN7sJ7o5XPWioW5WlHAQU7G75K/QosMrAdSW
+          9MUgNTP52GE24HGNtLi1qoJFlcDyqSMo59ahy2cI2qBDLKobkx/J3vWraV0T9VuG
+          WCLKTVXkcGdtwlfFRjlBz4pYg1htmf5X6DYO8A4jqv2Il9DjXA6USbW1FzXSLr9O
+          he8Y4IWS6wY7bCkjCWDcRQJMEhg76fsO3txE+FiYruq9RUWhiF1myv4Q6W+CyBFC
+          Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
+          -----END CERTIFICATE-----
+    passthrough:
+      ingressGateway: "passthrough-ingressgateway"
+      hosts:
+      - "*.{{ .Values.domain }}"
+      tls:
+        mode: "PASSTHROUGH"
+
+jaeger:
+  enabled: false
+  ingress: 
+    gateway: "public"
+  sso:
+    enabled: true
+    client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
+
+kiali:
+  enabled: false
+  ingress:
+    gateway: "private"
+
+logging:
+  enabled: false
+  license:
+    trial: true
+  sso:
+    enabled: true
+    client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kibana
+    # client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-kibana
+  values:
+    elasticsearch:
+      master:
+        count: 1
+        persistence:
+          size: 500Mi
+        resources:
+          requests:
+            cpu: .5
+          limits: {}
+        heap:
+          min: 1g
+          max: 1g
+      data:
+        count: 1
+        persistence:
+          size: 500Mi
+        resources:
+          requests:
+            cpu: .5
+          limits: {}
+        heap:
+          min: 1g
+          max: 1g
+    kibana:
+      count: 1
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+monitoring:
+  enabled: false
+  ingress:
+    gateway: "public"
+  sso:
+    enabled: false
+    prometheus: 
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_prometheus
+    alertmanager:
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_alertmanager
+    grafana:
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_grafana
+      scopes: "Grafana"
+      # # client_secret: "d558e06a-b7b9-4b66-88c2-fa784158e4fb"
+      # auth_url: "https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/openid-connect/auth"
+      # token_url: "https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/openid-connect/token"
+      # api_url: "https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/openid-connect/userinfo"
+    # prometheus: 
+    #   client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-prometheus
+    # alertmanager:
+    #   client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-alertmanager
+    # grafana:
+    #   client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-grafana
+    #   scopes: "Grafana"
+
+
+twistlock:
+  enabled: false
+  ingress:
+    gateway: "private"
+  values:
+    console:
+      persistence:
+        size: 5Gi
+
+
+# Gloabl SSO parameters
+sso:
+  oidc:
+    host: keycloak.bigbang.dev
+    # host: login.dso.mil
+    # host: login.staging.dso.mil
+    realm: baby-yoda
+  # client_secret: ""
+
+  # # Entrust CA for login.dso.mil
+  # certificate_authority: |
+  #   -----BEGIN CERTIFICATE-----
+  #   MIIH0zCCBrugAwIBAgIQHeg1retyhPnWuzryBJeBvTANBgkqhkiG9w0BAQsFADCB
+  #   ujELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUVudHJ1c3QsIEluYy4xKDAmBgNVBAsT
+  #   H1NlZSB3d3cuZW50cnVzdC5uZXQvbGVnYWwtdGVybXMxOTA3BgNVBAsTMChjKSAy
+  #   MDEyIEVudHJ1c3QsIEluYy4gLSBmb3IgYXV0aG9yaXplZCB1c2Ugb25seTEuMCwG
+  #   A1UEAxMlRW50cnVzdCBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eSAtIEwxSzAeFw0y
+  #   MDEyMTUwMzE1MDJaFw0yMjAxMTQwMzE1MDJaMHMxCzAJBgNVBAYTAlVTMREwDwYD
+  #   VQQIEwhDb2xvcmFkbzEZMBcGA1UEBxMQQ29sb3JhZG8gU3ByaW5nczEeMBwGA1UE
+  #   ChMVRGVwYXJ0bWVudCBvZiBEZWZlbnNlMRYwFAYDVQQDEw1sb2dpbi5kc28ubWls
+  #   MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAymUXk7STDlepS5HJu0ca
+  #   B57S5dfLp7zxYmcsGjo10YkHy3m9LASQCTyiioDrlwo2b+n8oZ7esGLv3RgggMwf
+  #   xvLVyx1+lZDswxdQoXmjArTdbqpcSoq3Y1rvVp33/jGb3slBjQtcMt2QvaFv3fxy
+  #   cwwINvJFEqsQS7zGUgpolJ3smKdcVpUSGZmzpYposuDlPUGeOJaQRMAACW5arWiT
+  #   VkDhJD+OVOYEHW8uCQfghD3JJXu6Xp9SwlWe6UNOdxo9cq3s/XE4ZwEgffdLXP2A
+  #   wuJF/7B7CFdZjIMptmOODyCeatC344iyubU0MiGCOm4W4wn0pQ0XJtAzWeYFKATL
+  #   9BquNOzPUR6pMSFMvIEiS96zbVFuOYt2XKgPryWEYji3Oky082WWYOcXt0NnqnCj
+  #   SafVU+2fQi4jQ0att5YXagEEPz83lQZdSKb2+grDeFg78VrEZAe+Y0mVu4/G93he
+  #   UOqfZ9jdCnFXq8sEMG9bJJFKeOXkb1Da8Y0amfOw4hFd4UslrbvC5ZCUZNh6roOk
+  #   8kast9QWtWFIGPC3f+Uq3gvx3GBHzIG9QPOq1CjSSAF3tWKuMTxK4zaS33mriJo0
+  #   Dv1CMX3FCmjT/qG3422guBL02hbGHveDSWk0/saY7ZWFifxnvKEdOi4ItnpMuQhE
+  #   zx6/+t7FWuzBTPAeVqV1l2sCAwEAAaOCAxkwggMVMAwGA1UdEwEB/wQCMAAwHQYD
+  #   VR0OBBYEFCLwpnkje7QKLWok+nWIeBEnIGfmMB8GA1UdIwQYMBaAFIKicHTdvFM/
+  #   z3vU981/p2DGCky/MGgGCCsGAQUFBwEBBFwwWjAjBggrBgEFBQcwAYYXaHR0cDov
+  #   L29jc3AuZW50cnVzdC5uZXQwMwYIKwYBBQUHMAKGJ2h0dHA6Ly9haWEuZW50cnVz
+  #   dC5uZXQvbDFrLWNoYWluMjU2LmNlcjAzBgNVHR8ELDAqMCigJqAkhiJodHRwOi8v
+  #   Y3JsLmVudHJ1c3QubmV0L2xldmVsMWsuY3JsMCcGA1UdEQQgMB6CDWxvZ2luLmRz
+  #   by5taWyCDWxvZ2luLmRzb3AuaW8wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQG
+  #   CCsGAQUFBwMBBggrBgEFBQcDAjBMBgNVHSAERTBDMDcGCmCGSAGG+mwKAQUwKTAn
+  #   BggrBgEFBQcCARYbaHR0cHM6Ly93d3cuZW50cnVzdC5uZXQvcnBhMAgGBmeBDAEC
+  #   AjCCAX4GCisGAQQB1nkCBAIEggFuBIIBagFoAHUAVhQGmi/XwuzT9eG9RLI+x0Z2
+  #   ubyZEVzA75SYVdaJ0N0AAAF2ZGTpIwAABAMARjBEAiAK+W9ukx92DJPFV87LexEg
+  #   /qDFTjtkiLh/z+mLmDtOwQIgUD4YrMuo22sV9MeJ8JmzraCQVdUUIprw4K4HN+eO
+  #   6W0AdwDfpV6raIJPH2yt7rhfTj5a6s2iEqRqXo47EsAgRFwqcwAAAXZkZOlKAAAE
+  #   AwBIMEYCIQDRpvbR/GroWSGlCIh1q0RUITb8RfI4skqqBa/FeU811AIhAPlRY4lv
+  #   DC2u9MFSEiCVeaFYJRU0xvAwmHQMtrl+IE4iAHYARqVV63X6kSAwtaKJafTzfREs
+  #   QXS+/Um4havy/HD+bUcAAAF2ZGTrYAAABAMARzBFAiEAifP8Y0nXFBykaTyzpWpv
+  #   E3FDi8NCQeJFRMJqD7loTjMCIHVDio7r+zANTbIdRLRRzHoNzo//xfJ0JUqejNRA
+  #   aCpZMA0GCSqGSIb3DQEBCwUAA4IBAQB/wtYjDQiPLe99tZq98IyxOSJCli2mtlV9
+  #   gSC67aj4rgW6g+C8P1bSoB5PamMq6rON5q0SXL3CQiQ7vegxCQnleDh0LWeKPFS2
+  #   jjSIl3CvrYfBlNBzw4H1uAa/yw+enr0So8oX8kdSTBFGnU4KoK646lFZRXSifFIU
+  #   zzQ9QYYedmiP0iKs5LDYGAOsB/w/O94+zv6qGKXA1fVzBXAD54MddqGk9mHZTSyL
+  #   6nsSTx4r8vCGQir7d2QuIGLD48zaYQz0TFcGKnBV3/9CB27RxJkRdMwUbMvNdp3C
+  #   V+C2+jdR8xA/0qCnvSxHc1lTZgXxVkcu/wpqIBn3af5Ha8ddd0DU
+  #   -----END CERTIFICATE-----
+  #   -----BEGIN CERTIFICATE-----
+  #   MIIFDjCCA/agAwIBAgIMDulMwwAAAABR03eFMA0GCSqGSIb3DQEBCwUAMIG+MQsw
+  #   CQYDVQQGEwJVUzEWMBQGA1UEChMNRW50cnVzdCwgSW5jLjEoMCYGA1UECxMfU2Vl
+  #   IHd3dy5lbnRydXN0Lm5ldC9sZWdhbC10ZXJtczE5MDcGA1UECxMwKGMpIDIwMDkg
+  #   RW50cnVzdCwgSW5jLiAtIGZvciBhdXRob3JpemVkIHVzZSBvbmx5MTIwMAYDVQQD
+  #   EylFbnRydXN0IFJvb3QgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkgLSBHMjAeFw0x
+  #   NTEwMDUxOTEzNTZaFw0zMDEyMDUxOTQzNTZaMIG6MQswCQYDVQQGEwJVUzEWMBQG
+  #   A1UEChMNRW50cnVzdCwgSW5jLjEoMCYGA1UECxMfU2VlIHd3dy5lbnRydXN0Lm5l
+  #   dC9sZWdhbC10ZXJtczE5MDcGA1UECxMwKGMpIDIwMTIgRW50cnVzdCwgSW5jLiAt
+  #   IGZvciBhdXRob3JpemVkIHVzZSBvbmx5MS4wLAYDVQQDEyVFbnRydXN0IENlcnRp
+  #   ZmljYXRpb24gQXV0aG9yaXR5IC0gTDFLMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+  #   MIIBCgKCAQEA2j+W0E25L0Tn2zlem1DuXKVh2kFnUwmqAJqOV38pa9vH4SEkqjrQ
+  #   jUcj0u1yFvCRIdJdt7hLqIOPt5EyaM/OJZMssn2XyP7BtBe6CZ4DkJN7fEmDImiK
+  #   m95HwzGYei59QAvS7z7Tsoyqj0ip/wDoKVgG97aTWpRzJiatWA7lQrjV6nN5ZGhT
+  #   JbiEz5R6rgZFDKNrTdDGvuoYpDbwkrK6HIiPOlJ/915tgxyd8B/lw9bdpXiSPbBt
+  #   LOrJz5RBGXFEaLpHPATpXbo+8DX3Fbae8i4VHj9HyMg4p3NFXU2wO7GOFyk36t0F
+  #   ASK7lDYqjVs1/lMZLwhGwSqzGmIdTivZGwIDAQABo4IBDDCCAQgwDgYDVR0PAQH/
+  #   BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQAwMwYIKwYBBQUHAQEEJzAlMCMGCCsG
+  #   AQUFBzABhhdodHRwOi8vb2NzcC5lbnRydXN0Lm5ldDAwBgNVHR8EKTAnMCWgI6Ah
+  #   hh9odHRwOi8vY3JsLmVudHJ1c3QubmV0L2cyY2EuY3JsMDsGA1UdIAQ0MDIwMAYE
+  #   VR0gADAoMCYGCCsGAQUFBwIBFhpodHRwOi8vd3d3LmVudHJ1c3QubmV0L3JwYTAd
+  #   BgNVHQ4EFgQUgqJwdN28Uz/Pe9T3zX+nYMYKTL8wHwYDVR0jBBgwFoAUanImetAe
+  #   733nO2lR1GyNn5ASZqswDQYJKoZIhvcNAQELBQADggEBADnVjpiDYcgsY9NwHRkw
+  #   y/YJrMxp1cncN0HyMg/vdMNY9ngnCTQIlZIv19+4o/0OgemknNM/TWgrFTEKFcxS
+  #   BJPok1DD2bHi4Wi3Ogl08TRYCj93mEC45mj/XeTIRsXsgdfJghhcg85x2Ly/rJkC
+  #   k9uUmITSnKa1/ly78EqvIazCP0kkZ9Yujs+szGQVGHLlbHfTUqi53Y2sAEo1GdRv
+  #   c6N172tkw+CNgxKhiucOhk3YtCAbvmqljEtoZuMrx1gL+1YQ1JH7HdMxWBCMRON1
+  #   exCdtTix9qrKgWRs6PLigVWXUX/hwidQosk8WwBD9lu51aX8/wdQQGcHsFXwt35u
+  #   Lcw=
+  #   -----END CERTIFICATE-----
+  #   -----BEGIN CERTIFICATE-----
+  #   MIIEPjCCAyagAwIBAgIESlOMKDANBgkqhkiG9w0BAQsFADCBvjELMAkGA1UEBhMC
+  #   VVMxFjAUBgNVBAoTDUVudHJ1c3QsIEluYy4xKDAmBgNVBAsTH1NlZSB3d3cuZW50
+  #   cnVzdC5uZXQvbGVnYWwtdGVybXMxOTA3BgNVBAsTMChjKSAyMDA5IEVudHJ1c3Qs
+  #   IEluYy4gLSBmb3IgYXV0aG9yaXplZCB1c2Ugb25seTEyMDAGA1UEAxMpRW50cnVz
+  #   dCBSb290IENlcnRpZmljYXRpb24gQXV0aG9yaXR5IC0gRzIwHhcNMDkwNzA3MTcy
+  #   NTU0WhcNMzAxMjA3MTc1NTU0WjCBvjELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUVu
+  #   dHJ1c3QsIEluYy4xKDAmBgNVBAsTH1NlZSB3d3cuZW50cnVzdC5uZXQvbGVnYWwt
+  #   dGVybXMxOTA3BgNVBAsTMChjKSAyMDA5IEVudHJ1c3QsIEluYy4gLSBmb3IgYXV0
+  #   aG9yaXplZCB1c2Ugb25seTEyMDAGA1UEAxMpRW50cnVzdCBSb290IENlcnRpZmlj
+  #   YXRpb24gQXV0aG9yaXR5IC0gRzIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+  #   AoIBAQC6hLZy254Ma+KZ6TABp3bqMriVQRrJ2mFOWHLP/vaCeb9zYQYKpSfYs1/T
+  #   RU4cctZOMvJyig/3gxnQaoCAAEUesMfnmr8SVycco2gvCoe9amsOXmXzHHfV1IWN
+  #   cCG0szLni6LVhjkCsbjSR87kyUnEO6fe+1R9V77w6G7CebI6C1XiUJgWMhNcL3hW
+  #   wcKUs/Ja5CeanyTXxuzQmyWC48zCxEXFjJd6BmsqEZ+pCm5IO2/b1BEZQvePB7/1
+  #   U1+cPvQXLOZprE4yTGJ36rfo5bs0vBmLrpxR57d+tVOxMyLlbc9wPBr64ptntoP0
+  #   jaWvYkxN4FisZDQSA/i2jZRjJKRxAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAP
+  #   BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRqciZ60B7vfec7aVHUbI2fkBJmqzAN
+  #   BgkqhkiG9w0BAQsFAAOCAQEAeZ8dlsa2eT8ijYfThwMEYGprmi5ZiXMRrEPR9RP/
+  #   jTkrwPK9T3CMqS/qF8QLVJ7UG5aYMzyorWKiAHarWWluBh1+xLlEjZivEtRh2woZ
+  #   Rkfz6/djwUAFQKXSt/S1mja/qYh2iARVBCuch38aNzx+LaUa2NSJXsq9rD1s2G2v
+  #   1fN2D807iDginWyTmsQ9v4IbZT+mD12q/OWyFcq1rca8PdCE6OoGcrBNOTJ4vz4R
+  #   nAuknZoh8/CbCzB428Hch0P+vGOaysXCHMnHjf87ElgI5rY97HosTvuDls4MPGmH
+  #   VHOkc8KT/1EQrBVUAdj8BbGJoX90g5pJ19xOe4pIb4tF9g==
+  #   -----END CERTIFICATE-----
+
+  # Lets Encrypt CA for keycloak.bigbang.dev
+  certificate_authority: |
+    -----BEGIN CERTIFICATE-----
+    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
+    -----END CERTIFICATE-----
+
+  # The JSON Web Key Set (JWKS) containing the public keys used to verify any JSON Web Token (JWT) issued by the IDP
+  # The jwks is used by Istio authservice
+  # Must be updated for every new deployment of keycloak.  Example of where to get the jwks
+  # https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/openid-connect/certs
+  # must be single quoted and double quotes must be escaped  \"xxxx\"
+  # export KEYCLOAK_IDP_JWKS=$(curl https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/openid-connect/certs | sed 's@"@\\"@g')
+  jwks: '{\"keys\":[{\"kid\":\"IBp7D6vo2xhxBJi5QOZU_QYYpKOE3VZi54F2l4D-Hwk\",\"kty\":\"RSA\",\"alg\":\"RS256\",\"use\":\"sig\",\"n\":\"hzE2wnMkA753SaAqM0u5sVxYvPfgcp-BBwCV4gn7KF4jXv-_AX0FzEejOeoPCVYnqOjET7Yuf-Fmx8j9blcg5nDTu5SuscrXrhi7Yo_wzBiFE1mnlSXtw4Go_btHSpFlt5_FSazK4O8zf0k49uCNAUzFzN7IezGWUXtoClvxjkedpOeHbHDtWZ1cB-fOlhJGyOxZVorYXCCFmKu5qFVyO8TAjYJOlbL710c1VkJGww_F6K4XhLWdZd9jo729bqABWmK-ZYqNv5JtbNA9l7wp7H54jRLhmJ18I2a64-r2-Enr8XwsFAQ56sk-LSwaQmhUVPA3V0aIkmSzUyyfpQ3ZTQ\",\"e\":\"AQAB\",\"x5c\":[\"MIICoTCCAYkCBgF/TCFfbTANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjIwMzAyMTkzMzQ5WhcNMzIwMzAyMTkzNTI5WjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCHMTbCcyQDvndJoCozS7mxXFi89+Byn4EHAJXiCfsoXiNe/78BfQXMR6M56g8JVieo6MRPti5/4WbHyP1uVyDmcNO7lK6xyteuGLtij/DMGIUTWaeVJe3Dgaj9u0dKkWW3n8VJrMrg7zN/STj24I0BTMXM3sh7MZZRe2gKW/GOR52k54dscO1ZnVwH586WEkbI7FlWithcIIWYq7moVXI7xMCNgk6VsvvXRzVWQkbDD8XorheEtZ1l32Ojvb1uoAFaYr5lio2/km1s0D2XvCnsfniNEuGYnXwjZrrj6vb4SevxfCwUBDnqyT4tLBpCaFRU8DdXRoiSZLNTLJ+lDdlNAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAFxdt+ezj6IisOJdIPZA7d0kN8Oneg+5ZWtgbjbmBXoY0n0fwyZukqP5LSGT13UaKMr8eUAYnCHuTjMdEFEMlXQNHxcNErT/O5+vgUmV47BHDXd+p+a7JBbXP2J30X8kKdqvm7GtbOMGVIFa2QvzzfhkcZYKGCVqG4mt6DGKL8aMfu7wk8Voo1MhfsDz9WK218c28fujbGTlrkBJu7D32PhzI4jVuWDqbpYbl7VCleaIxRP/z807eS4lmvTmmphND28n2gLIgNM0LwdYGxNR8mzYJRi79RIkcLlfen0hgNs/QLH8nDRnNcD0NUFE5L9UX3uOx11aFeOEqxz5fiGuIeE=\"],\"x5t\":\"eDGvONjOq1Ldj6_fMo2C-W9RShM\",\"x5t#S256\":\"Y8EotW7_4OdZZZNSMSDfieIX1-WJmisLhxcmrbzUFlc\"}]}'
+
+
+addons:
+
+  # authservice:
+  #   enabled: false
+
+  anchore:
+    enabled: false
+    ingress:
+      gateway: "public"
+    adminPassword: admin
+    sso:
+      enabled: true
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_anchore
+      # client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-anchore
+    enterprise:
+      enabled: true
+      # licenseYaml: "xxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+  argocd:
+    enabled: false
+    ingress:
+      gateway: "public"
+    sso:
+      enabled: true
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_argocd
+      # client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-argocd
+      client_secret: anything-for-dev
+      provider_name: "DEV SSO"
+      groups: |
+        g, Impact Level 2 Authorized, role:admin
+
+  # authservice:
+  #   enabled: true
+  #   ingress:
+  #     gateway: "private"
+  # haproxy:
+  #   enabled: true
+  #   ingress:
+  #     gateway: "private"
+
+
+
+  keycloak:
+    enabled: true
+
+    # git:
+    #   # tag: "17.0.1-bb.0"
+    #   tag: null
+    #   branch: "renovate/ironbank"
+
+    ingress:
+      gateway: "passthrough"
+
+    # database:
+    #   host: postgres-postgresql-headless.postgres.svc.cluster.local 
+    #   type: postgres
+    #   port:  5432
+    #   database: postgres
+    #   username: postgres
+    #   password: postgres
+    values:
+      replicas: 1
+      # istio:
+      #   injection: "enabled"
+      # networkPolicies:
+      #   enabled: false
+      # image:
+      #   repository: registry1.dso.mil/ironbank/opensource/keycloak/keycloak
+      #   tag: 18.0.0
+      secrets:
+        env:
+          stringData:
+            CUSTOM_REGISTRATION_CONFIG: /opt/jboss/keycloak/customreg.yaml
+            KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm.json
+            X509_CA_BUNDLE: /etc/x509/https/cas.pem
+            # KEYCLOAK_LOGLEVEL: DEBUG
+            # WILDFLY_LOGLEVEL: DEBUG
+        certauthority:
+          stringData:
+            cas.pem: '{{ .Files.Get "resources/dev/dod_cas.pem" }}'
+        customreg:
+          stringData:
+            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda.yaml" }}'
+        realm:
+          stringData:
+            realm.json: '{{ .Files.Get "resources/dev/baby-yoda.json" }}'
+      extraVolumes: |-              
+        - name: certauthority
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-certauthority
+        - name: customreg
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-customreg
+        - name: realm
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-realm
+      extraVolumeMounts: |-
+        - name: certauthority
+          mountPath: /etc/x509/https/cas.pem
+          subPath: cas.pem
+          readOnly: true
+        - name: customreg
+          mountPath: /opt/jboss/keycloak/customreg.yaml
+          subPath: customreg.yaml
+          readOnly: true
+        - name: realm
+          mountPath: /opt/jboss/keycloak/realm.json
+          subPath: realm.json
+          readOnly: true
+
+  gitlabRunner:
+    enabled: false
+
+  gitlab:
+    enabled: false
+
+    # git:
+    #   tag: null
+    #   branch: "dev-branch-name"
+
+    ingress:
+      gateway: "public"
+
+    hostnames:
+      gitlab: gitlab
+      registry: registry
+    sso:
+      enabled: true
+      label: "Platform One SSO"
+      client_id: "dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_gitlab"
+      # client_id: "platform1_a86040cc9-f5e9-4656-802d-d05624370245_bb8-gitlab"
+      client_secret: ""
+    # database:
+    #   host: postgres-postgresql-headless.postgres.svc.cluster.local
+    #   port: 5432
+    #   username: postgres
+    #   database: postgres
+    #   password: postgres
+    # objectStorage:
+    #   type: minio
+    #   endpoint: http://minio.minio.svc.cluster.local:9000
+    #   region: us-west-1
+    #   accessKey: myaccesskey
+    #   accessSecret: mysecretkey
+    #   bucketPrefix: kwilder
+    # objectStorage:
+    #   type: minio
+    #   endpoint: https://minio.bigbang.dev
+    #   region: us-west-1
+    #   accessKey: minio
+    #   accessSecret: minio123
+    #   bucketPrefix: kwilder
+    # objectStorage:
+    #   type: s3
+    #   endpoint: https://s3.amazonaws.com
+    #   region: us-gov-west-1
+    #   accessKey: myaccesskey
+    #   accessSecret: mysecretkey
+    #   bucketPrefix: kwilder
+    values:
+      gitlab: 
+        webservice:
+          minReplicas: 1
+          maxReplicas: 1
+        gitlab-shell:
+          minReplicas: 1
+          maxReplicas: 1
+        sidekiq:
+          minReplicas: 1
+          maxReplicas: 1
+      registry:
+        hpa:
+          minReplicas: 1
+          maxReplicas: 1
+      global:
+        appConfig:
+          defaultCanCreateGroup: true
+        # registry:
+        #   bucket: custom-bucket
+
+  sonarqube:
+    enabled: false
+    # git:
+    #   tag: null
+    #   branch: "bcobb-dev-sonarqube"
+    ingress:
+      gateway: "public"
+    sso:
+      enabled: true
+      # client_id: "platform1_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_bb8-saml-sonarqube"
+      client_id: "dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_saml-sonarqube"
+      label: "keycolak sso"
+      ## this is the Keycloak realm cert
+      # certificate: "MIICoTCCAYkCBgF7y7klyDANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjEwOTA5MTgwMDEzWhcNMzEwOTA5MTgwMTUzWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC+X+h2SzfuLCTZTgDLYeMplGPfEBQM+ZrH5ZFApkVJANpf/0dVDoVN7zv61pNs34WeJXHPUoQ0lCwvnPV8QH60JSdHpaWFUC6iGwTdjFU5CQPAjmc+IhUjgT3GMbH5/wqf9Tln6PVX9GsBSNS9fiC+0jyooGQMGJny3BLph0X21D95Pom+H7xbOY7NABZ4k1mu8o22MmVLQROpFJICwzOZNuVgskyGSqIJgDXPbwVZBjlr8fqZSt4SewHuCAAJ6/vyJyUM0Cl4YuaxsYPvCjhWlKF+gzkHp/nDNpVjVnqQurUzvKFqWiBjlUs9nAMO9S5tsKcGWuCLiSECKP44+NkXAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAK7XXTbIwLA3Gp3+7ZMQGnfnoipSKQU/o25LT4pyfClDzFGGe3qTEuIvhiIbf+BrzFIDWY0U2CEbeNFuKg8B2gxKYJ2P/DiOXA0iBFc4S1fRGtx8nS2x5PZfgGGM0xSM6PRNWJcTu9/XPi3YJ09hLMs5afypd6CuUM+40fvyTFV0GHpz/pbqeJBKTJsp6Kqwx8X/D82Ofxy/aohg++LAyasYZmWLdy6ywsjHvt2z2dEdDTVeA+gVztfMNViSuNPheYLBefM5kDnaDtSU7QcQ9riGIaEuH3NhoaVczM/sl6elQGjHJjJxk1pcKHa6N0MGMOKISji+vRWSJ7WGTe/TVEQ="
+      certificate: "MIICoTCCAYkCBgGBXtMQ7DANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjIwNjEzMjA0NjM5WhcNMzIwNjEzMjA0ODE5WjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCsVuZ37G5N3ZmjsIr1czshbQGHY4jaYV5kVLjtJzSNWSBjwE88rwgfo7RPowzRs+Hk3vbkdHNVPV1HlwojchuPmATCZ5zK/pZ1YpM215HPVn/HCHoQAwAV0mjvb12XPBOFdEtXq8AJpapNT5HXWdV/KXg1vcYabXkzXjNQKfZDvoNsdigCE9LvlD3NmICt5z9s2xjONd9BKr4dQG5/j+Bjq9iwG/ADNaFcDyl3LjeuneBm03fDKHcBZo5iz0lxY6ovocywe3ZtZecnZJEEcvntb9b4nt2QcHxP5VbF1ouyGADCipHPwoEhLSo8RT7LAZnVIrZYYokMFp1ypuG/n7QDAgMBAAEwDQYJKoZIhvcNAQELBQADggEBACgxHN3wSak5QFpF0tz8NzsmmnwfDoOuEONC1Jp2WAIFKZAsHlUPu8NM9Hni4D5hQNbQ/gYlu053uja2tvcrHjOfOUodSeHznqgHRS8kd68A+eS1eBdMfDOFvEPrS3pp3og57zuhDuyzGhBumebXIXR6ml7/Bjo74pFPmipa+K0VnOQpOXDvG/rsRBm/zhY7B9LQelET9dnmb2m/QxvCOxCr5rSj0kbNEzvDNYvA1HmGD0cHBLRmhLdXUdsvu2+XDO8X3Wd+KJcYgR/0kp5luXkK3DKmgSZ2HZJHmCdLeCed3Vo+NEJuHdzNvrQ8Z8j6O+qE+Y7K0vh9vXDqcqxPhUU="
+      login: login
+      name: name
+      email: email
+      group: group
+
+
+
+  nexus:
+    enabled: false
+
+    git:
+      # tag: "34.1.0-bb.5"
+      # tag: "36.0.0-bb.0"
+      tag: null
+      branch: "renovate/ironbank"
+
+    # -- Base64 encoded license file.
+    # cat ~/Downloads/sonatype-license-2021-10-20T182737Z.lic | base64 -w 0 ; echo
+    license_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ingress:
+      gateway: "public"
+    sso:
+      # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
+      enabled: true
+      idp_data:
+        entityId: "https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata"
+        # -- IdP Field Mappings
+        # -- NXRM username attribute
+        username: "username"
+        firstName: "firstName"
+        lastName: "lastName"
+        email: "email"
+        groups: "groups"
+        # -- IDP SAML Metadata XML as a single line string in single quotes
+        # -- this information is public and does not require a secret
+        # curl https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml/descriptor ; echo
+        idpMetadata: '<md:EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="https://keycloak.bigbang.dev/auth/realms/baby-yoda"><md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><md:KeyDescriptor use="signing"><ds:KeyInfo><ds:KeyName>biKPhrGm6aq_JrmNenUl_ag8nvFKF8UUv2IIZDpD5yo</ds:KeyName><ds:X509Data><ds:X509Certificate>MIICoTCCAYkCBgF/BE65/TANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjIwMjE2MjA1MDQyWhcNMzIwMjE2MjA1MjIyWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCEDkkb9IMVng5DbjD+JsNhf3M7KfiCFps4B7oPB8IosTJpqCzpq2uLLzFU2LhpbZuqyFs1C1j7DClvWsryQRqYegQHYBJc3Dr3bzdyxZVZfuWu5H2mgEPMP2JcSks1w67ZHIN65PG8wqJvhCle/U7m+u+cuQy9qXLSMiuJ8QDvgEjKUaszPzC6Oip9IVW6vQ/YoWi4bDw7cMoAHaFwta6vuoYtYxiAvVHG2DDAucrcS4rap69td9WQNscFR8Bg12YQ+h4GM253CGxzsbN/6Y1tKHjJdBQZDrg5rUNPH//OL0Ez370sAvaRnFHEEq2oFWVxLJNWrFWQ1QMUyLfEc2hDAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAGeLZzxAQ9ov41AOqeQdGToCo1LWo9cVoZXZ3KK58qLqrobChA3tMoXOGehMov5zaxR6yX+gb8ke+qb/iUUXGTuyEXk7P/oc5LN8jJHniuJWB6wRP90ZfJ1QhlqVZufxU9vIY2sHv3K5nbNJEKwVrjhjNntmFybf3czpnnCn+fXwMRtL+jz/1Ci8Fs9nuCpv64+5WIyoy4liGGk4OP+9IUNONXtEqYLoodBkCK/YAaoY3QCvN7D6ty/xiq75ORVSd4DyWkgpfYpwph/a6oDtR+TEpwwbzemgJlicE1PRRQakBYGkDixf4gXK3M0QUQ4mra93xHitxAgl0StiTQjhNXo=</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml/resolve" index="0"></md:ArtifactResolutionService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService></md:IDPSSODescriptor></md:EntityDescriptor>'
+      role:
+        # id is the name of the Keycloak group (case sensitive)
+        - id: "Nexus"
+          name: "Keycloak Nexus Group"
+          description: "unprivilaged users"
+          privileges: []
+          roles: []
+        - id: "Nexus-Admin"
+          name: "Keycloak Nexus Admin Group"
+          description: "keycloak users as admins"
+          privileges:
+            - "nx-all"
+          roles:
+            - "nx-admin"
+    values:
+      networkPolicies:
+        enabled: false
+      nexus:
+        repository:
+          enabled: true
+         
+    # NexusNotes: |
+    #   get nexus x509 cert from Nexus Admin UI
+    #     https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata
+    #   copy and paste the nexus single line cert into a text file and save it
+    #     vi nexus-x509.txt
+    #     -----BEGIN CERTIFICATE-----
+    #     put-single-line-nexus-x509-certificate-here
+    #     -----END CERTIFICATE-----
+    #   make a valid pem file with proper wrapping at 64 characters per line
+    #     fold -w 64 nexus-x509.txt > nexus.pem
+    #   In Keycloak go to the nexus client and on the Keys tab import the nexus.pem file in two places
+
+
+  vault:
+    enabled: false
+
+    # git:
+    #   # tag: "17.0.1-bb.0"
+    #   tag: null
+    #   branch: "22-image-updates"
+
+    ingress:
+      gateway: "passthrough"
+      
+    values:
+      autoInit:
+        enabled: true
+      global:
+        tlsDisable: false
+      injector:
+        extraEnvironmentVars:
+          AGENT_INJECT_VAULT_ADDR: "https://vault.bigbang.dev"
+      server:
+        extraEnvironmentVars:
+          VAULT_API_ADDR: https://vault.bigbang.dev  #istio GW
+          VAULT_ADDR:  https://127.0.0.1:8200
+          VAULT_SKIP_VERIFY: "true"
+          VAULT_LOG_FORMAT: "json"
+          # VAULT_LICENSE: "xxxxxxxxx"
+        ha:
+          enabled: true
+          replicas: 3
+          raft:
+            enabled: true
+            config: |
+              ui = true
+
+              listener "tcp" {
+                tls_disable = 0
+                address = "[::]:8200"
+                cluster_address = "[::]:8201"
+                tls_cert_file = "/vault/tls/tls.crt"
+                tls_key_file  = "/vault/tls/tls.key"
+              }
+
+              storage "raft" {
+                path = "/vault/data"
+
+                retry_join {
+                  leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
+                  leader_client_cert_file = "/vault/tls/tls.crt"
+                  leader_client_key_file = "/vault/tls/tls.key"
+                  leader_tls_servername = "vault.bigbang.dev"
+                }
+
+                retry_join {
+                  leader_api_addr = "https://vault-vault-1.vault-vault-internal:8200"
+                  leader_client_cert_file = "/vault/tls/tls.crt"
+                  leader_client_key_file = "/vault/tls/tls.key"
+                  leader_tls_servername = "vault.bigbang.dev"
+                }
+
+                retry_join {
+                  leader_api_addr = "https://vault-vault-2.vault-vault-internal:8200"
+                  leader_client_cert_file = "/vault/tls/tls.crt"
+                  leader_client_key_file = "/vault/tls/tls.key"
+                  leader_tls_servername = "vault.bigbang.dev"
+                }
+              }
+
+              seal "awskms" {
+                region     = "us-gov-west-1"
+                kms_key_id = "17c01cdf-2bf9-4f58-9a54-c1c4e4b145be"
+                endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
+              }
+
+              telemetry {
+                prometheus_retention_time = "24h"
+                disable_hostname = true
+                unauthenticated_metrics_access = true
+              }
+
+              service_registration "kubernetes" {}

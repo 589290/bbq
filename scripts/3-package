@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export KUBECONFIG=~/.kube/bbq-config
+
+echo '⏳ deploying/upgrading single release from package dir'
+
+helm upgrade \
+  --install ek ./chart \
+  --namespace logging \
+  --values ~/bbq/overrides/ib_creds.yaml

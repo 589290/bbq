@@ -1,0 +1,168 @@
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+
+networkPolicies:
+  enabled: false
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: true
+
+twistlock:
+  enabled: false
+
+
+sso:
+  oidc:
+    host: login.dso.mil
+    realm: baby-yoda
+  client_secret: ""
+
+# prometheus / grafana / alertmanager
+monitoring:
+  enabled: true
+#  git:
+#    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+#    path: "./chart"
+#    tag: "40.0.0-bb.0"
+  git:
+    tag: null
+    branch: "97-add-high-availability-capability-for-prometheus"
+
+  # flux reconciliation overrides specifically for the Monitoring Package
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
+
+  values:
+    grafana:
+      replicas: 3
+    thanosRuler:
+      enabled: true
+    prometheusOperator:
+      clusterDomain: "cluster.local"
+    prometheus:
+      thanosService:
+        enabled: true
+      thanosServiceMonitor:
+        enabled: true
+      prometheusSpec:
+        replicas: 3
+        #thanos:
+          #objstoreConfig: |-
+          #  type: s3
+          #  config:
+          #    bucket: thanos
+          #    endpoint: {{ include "thanos.minio.fullname" . }}.monitoring.svc.cluster.local:9000
+          #    access_key: minio
+          #    secret_key: minio123
+          #    insecure: true
+          #querier:
+          #  dnsDiscovery:
+          #    sidecarsService: kube-prometheus-prometheus-thanos
+          #    sidecarsNamespace: monitoring
+          #bucketweb:
+          #  enabled: true
+          #compactor:
+          #  enabled: true
+          #storegateway:
+          #  enabled: true
+          #ruler:
+          #  enabled: true
+          #  alertmanagers:
+          #    - http://kube-prometheus-alertmanager.monitoring.svc.cluster.local:9093
+          #  config: |-
+          #    groups:
+          #      - name: "metamonitoring"
+          #        rules:
+          #          - alert: "PrometheusDown"
+          #            expr: absent(up{prometheus="monitoring/kube-prometheus"})
+          #metrics:
+          #  enabled: true
+          #  serviceMonitor:
+          #    enabled: true
+          #minio:
+          #  enabled: true
+          #  accessKey:
+          #    password: "minio"
+          #  secretKey:
+          #    password: "minio123"
+          #  defaultBuckets: "thanos"
+
+    alertmanager:
+      alertmanagerSpec:
+        replicas: 3
+      config:
+        global:
+          resolve_timeout: 5m
+        route:
+          # Keeping the default of 'job' but 'alertname' is also used often
+          group_by: ['job']
+          group_wait: 30s
+          group_interval: 5m
+          # repeat_interval upped from default of 12h
+          repeat_interval: 24h
+          # receiver updated from 'null' to 'mattermost' so it becomes the default
+          receiver: 'mattermost'
+          routes:
+          - match:
+              alertname: Watchdog
+            receiver: 'null'
+        receivers:
+        - name: 'null'
+        # Adding a new receiver below the default 'null' receiver
+        - name: 'mattermost'
+          slack_configs:
+          - api_url: https://chat.bigbang.dev/hooks/arebgww5wfy7fdmb1ujbi9991c
+        templates:
+        - '/etc/alertmanager/config/*.tmpl'
+
+addons:
+  minioOperator:
+    enabled: true
+
+  minio:
+    enabled: true
+    values:
+      tenants:
+        pools:
+        - servers: 2
+          volumesPerServer: 4
+          size: 256Mi
+          resources:
+            requests:
+              cpu: 250m
+              memory: 2Gi
+            limits:
+              cpu: 250m
+              memory: 2Gi
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+            runAsNonRoot: true
+
+  mattermostoperator:
+    enabled: true
+
+  mattermost:
+    enabled: true

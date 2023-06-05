@@ -1,0 +1,71 @@
+#!/bin/bash
+
+echo
+echo '💥 destroying ec2 instance...'
+
+# check for tools
+tooldependencies=(jq sed aws ssh ssh-keygen scp kubectl)
+for tooldependency in "${tooldependencies[@]}"
+  do
+    command -v $tooldependency >/dev/null 2>&1 || { echo >&2 " $tooldependency is not installed.";  missingtool=1; }
+  done
+sed_gsed="sed"
+# verify sed version if mac
+uname="$(uname -s)"
+if [[ "${uname}" == "Darwin" ]]; then
+  if [[ $(command -v gsed) ]]; then
+    sed_gsed="gsed"
+  else
+    missingtool=1
+    echo ' gnu-sed is not installed. "brew install gnu-sed"'
+  fi
+fi
+# if tool missing, exit
+if [[ "${missingtool}" == 1 ]]; then
+  echo " Please install required tools. Aborting."
+  exit 1
+fi
+# getting AWs user name
+AWSUSERNAME=$( aws sts get-caller-identity --query Arn --output text | cut -f 2 -d '/' )
+# check for aws username environment variable. If not found then terminate script
+if [[ -z "${AWSUSERNAME}" ]]; then
+  echo "You must configure your AWS credentials. Your AWS user name is used to name resources in AWS. Example:"
+  echo "   aws configure"
+  exit 1
+else
+    echo "AWS User Name: ${AWSUSERNAME}"
+fi
+# Assign a name for your SSH Key Pair.  Typically, people use their username to make it easy to identify
+KeyName="${AWSUSERNAME}-dev"
+# Assign a name for your Security Group.  Typically, people use their username to make it easy to identify
+SGname="${AWSUSERNAME}-dev"
+# Identify which VPC to create the spot instance in
+VPC="vpc-065ffa1c7b2a2b979"  # default VPC
+AWSINSTANCEIDs=$( aws ec2 describe-instances \
+  --output text \
+  --query "Reservations[].Instances[].InstanceId" \
+  --filters "Name=tag:Name,Values=${AWSUSERNAME}-dev" "Name=instance-state-name,Values=running" )
+# If instance exists then terminate it 
+if [[ ! -z "${AWSINSTANCEIDs}" ]]; then 
+  echo "aws instances being terminated: ${AWSINSTANCEIDs}"
+  aws ec2 terminate-instances --instance-ids ${AWSINSTANCEIDs} &>/dev/null
+  echo -n "waiting for instance termination..."
+  aws ec2 wait instance-terminated --instance-ids ${AWSINSTANCEIDs} &> /dev/null
+  echo "done"
+else
+  echo "You had no running instances."
+fi
+echo "SecurityGroup name to be deleted: ${SGname}"
+aws ec2 delete-security-group --group-name=${SGname} &> /dev/null
+echo "KeyPair to be deleted: ${KeyName}"
+aws ec2 delete-key-pair --key-name ${KeyName} &> /dev/null
+exit 0 
+
+echo '✅ ec2 instance deleted!'
+
+
+# benchmark tool
+#SECONDS=0 && \
+#~/bbq/scripts/9999.sh && ~/bbq/scripts/0-k3d.sh && ~/bbq/scripts/1-registry1+flux.sh && ~/bbq/scripts/2-bb.sh
+#ELAPSED="Elapsed: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
+#echo "✅ $ELAPSED"

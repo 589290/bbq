@@ -1,0 +1,59 @@
+domain: bigbang.dev
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+networkPolicies:
+  enabled: true
+
+istio:
+  enabled: true
+
+istiooperator:
+  enabled: true
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: false
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+
+logging:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+monitoring:
+  enabled: false
+
+twistlock:
+  enabled: false
+
+sso:
+  oidc:
+    host: login.dso.mil
+    realm: baby-yoda
+  client_secret: ""
+
+addons:
+  vault:
+    enabled: true
+    git:
+      tag: null
+      branch: "14-make-token-claim-pvc-size-configurable"
+    values:
+      autoInit:
+        enabled: true
+      pvcSize: 8Gi

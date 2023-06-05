@@ -1,0 +1,123 @@
+#!/bin/bash
+
+export KUBECONFIG=~/.kube/bbq-config
+echo '⏳ deploying/upgrading bb via helm...'
+
+# defaults
+helm upgrade \
+  --install bigbang ~/bigbang/chart \
+  --create-namespace \
+  --namespace bigbang \
+  --values ~/bigbang/chart/values.yaml \
+  --values ~/bigbang/chart/ingress-certs.yaml \
+  --values ~/bbq/overrides/ib_creds.yaml \
+  --values ~/bbq/overrides/base.yaml
+
+# mattermost
+#helm upgrade \
+#  --install bigbang ~/bigbang/chart \
+#  --create-namespace \
+#  --namespace bigbang \
+#  --values ~/bigbang/chart/values.yaml \
+#  --values ~/bigbang/chart/ingress-certs.yaml \
+#  --values ~/bigbang/docs/assets/configs/example/dev-sso-values.yaml \
+#  --values ~/bbq/overrides/ib_creds.yaml \
+#  --values ~/bbq/overrides/mattermost.yaml
+
+# # monitoring
+# helm upgrade \
+#   --install bigbang ~/bigbang/chart \
+#   --create-namespace \
+#   --namespace bigbang \
+#   --values ~/bigbang/chart/values.yaml \
+#   --values ~/bigbang/chart/ingress-certs.yaml \
+#   --values ~/bigbang/docs/assets/configs/example/dev-sso-values.yaml \
+#   --values ~/bbq/overrides/ib_creds.yaml \
+#   --values ~/bbq/overrides/monitoring.yaml
+
+# HA monitoring
+#helm upgrade \
+#  --install bigbang ~/bigbang/chart \
+#  --create-namespace \
+#  --namespace bigbang \
+#  --values ~/bigbang/chart/values.yaml \
+#  --values ~/bigbang/chart/ingress-certs.yaml \
+#  --values ~/bigbang/docs/assets/configs/example/dev-sso-values.yaml \
+#  --values ~/bbq/overrides/ib_creds.yaml \
+#  --values ~/bbq/overrides/ha-monitoring-prometheus.yaml
+
+#--values ~/bbq/overrides/minio.yaml \
+
+# twistlock
+#helm upgrade \
+#  --install bigbang ~/bigbang/chart \
+#  --create-namespace \
+#  --namespace bigbang \
+#  --values ~/bigbang/chart/values.yaml \
+#  --values ~/bigbang/chart/ingress-certs.yaml \
+#  --values ~/bbq/overrides/ib_creds.yaml \
+#  --values ~/bigbang/docs/assets/configs/example/dev-sso-values.yaml \
+#  --values ~/bbq/overrides/twistlock.yaml \
+#  --values ~/bbq/overrides/velero.yaml \
+#  --values ~/bbq/overrides/minio.yaml
+
+# loki
+#helm upgrade \
+#  --install bigbang ~/bigbang/chart \
+#  --create-namespace \
+#  --namespace bigbang \
+#  --values ~/bigbang/chart/values.yaml \
+#  --values ~/bigbang/chart/ingress-certs.yaml \
+#  --values ~/bbq/overrides/ib_creds.yaml \
+#  --values ~/bbq/overrides/loki.yaml
+
+# kiali
+#helm upgrade \
+#  --install bigbang ~/bigbang/chart \
+#  --create-namespace \
+#  --namespace bigbang \
+#  --values ~/bigbang/chart/ingress-certs.yaml \
+#  --values ~/bbq/overrides/ib_creds.yaml \
+#  --values ~/bbq/overrides/kiali.yaml
+
+# ek
+#helm upgrade \
+#  --install bigbang ~/bigbang/chart \
+#  --create-namespace \
+#  --namespace bigbang \
+#  --values ~/bigbang/chart/values.yaml \
+#  --values ~/bigbang/chart/ingress-certs.yaml \
+#  --values ~/bigbang/docs/assets/configs/example/dev-sso-values.yaml \
+#  --values ~/bbq/overrides/ib_creds.yaml \
+#  --values ~/bbq/overrides/ek.yaml
+
+# gitlab
+#helm upgrade \
+#  --install bigbang ~/bigbang/chart \
+#  --create-namespace \
+#  --namespace bigbang \
+#  --values ~/bigbang/chart/values.yaml \
+#  --values ~/bigbang/chart/ingress-certs.yaml \
+#  --values ~/bbq/overrides/ib_creds.yaml \
+#  --values ~/bbq/overrides/gitlab.yaml
+
+# velero
+#helm upgrade \
+#  --install bigbang ~/bigbang/chart \
+#  --create-namespace \
+#  --namespace bigbang \
+#  --values ~/bigbang/chart/values.yaml \
+#  --values ~/bigbang/chart/ingress-certs.yaml \
+#  --values ~/bbq/overrides/ib_creds.yaml \
+#  --values ~/bbq/overrides/velero.yaml \
+#  --values ~/bbq/overrides/minio.yaml
+
+#  --set loki.enabled=true \
+#  --set promtail.enabled=false \
+#  --set tempo.enabled=false
+
+#  use in tandem w/ gatekeeper
+#  --values ~/bigbang/docs/example_configs/policy-overrides-k3d.yaml \
+
+echo '✅ bigbang upgraded.'
+echo

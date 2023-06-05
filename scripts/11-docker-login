@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export KUBECONFIG=~/.kube/bbq-config
+set +o history
+echo $REGISTRY1_PASSWORD | docker login registry1.dso.mil --username $REGISTRY1_USERNAME --password-stdin
+set -o history

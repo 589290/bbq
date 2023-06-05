@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# human readable ls
+alias l='ls -laFh'
+
+# recursively delete .DS_Store files and clear terminal
+alias c='find . -type d \( -path "./Library/*" -o -path "./.Trash" -o -path "./Pictures" \) -prune -o -name ".DS_Store" -print0 | xargs -0 rm && /usr/bin/clear ;'
+
+# generates a readme file for BB packages
+alias readme='curl -O https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/README.md.gotmpl && curl -O https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/.helmdocsignore && curl -O https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/_templates.gotmpl && docker run --rm -v "`pwd`:/helm-docs" -u $(id -u) jnorwood/helm-docs:v1.10.0 -s file -t /helm-docs/README.md.gotmpl -t /helm-docs/_templates.gotmpl --dry-run > README.md && rm .helmdocsignore README.md.gotmpl _templates.gotmpl'
+
+# shell into a lima VM
+alias lish="limactl shell $@"
+
+# run an image
+alias dun="docker run --platform linux/amd64 -ti --rm $@"
+
+# run an image and bash shell in
+alias dash="docker run --platform linux/amd64 -ti --rm --entrypoint=bash --user 0 $@"
+
+# shell into an ubi image
+alias dubi="docker run --platform linux/amd64 -ti --rm --entrypoint=bash --user 0 registry1.dso.mil/ironbank/redhat/ubi/ubi8:8.6"
+
+# gitty
+alias fp="git fetch && git pull"
+
+# others
+alias d=docker
+alias k=kubectl
+alias li=limactl

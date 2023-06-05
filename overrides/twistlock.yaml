@@ -1,0 +1,37 @@
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: false
+
+logging:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+
+networkPolicies:
+  enabled: true
+
+twistlock:
+  enabled: true
+  git:
+    tag: null
+    branch: "43-add-metrics-dashboards-to-grafana"
+  values: {}
+  postRenderers: []

@@ -1,0 +1,5 @@
+# the bane of any mac dev's existence
+.DS_Store
+
+# ignore ib credentials file
+overrides/ib_creds.yaml

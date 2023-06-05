@@ -1,0 +1,101 @@
+domain: bigbang.dev
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+networkPolicies:
+  enabled: true
+
+istio:
+  enabled: true
+
+istiooperator:
+  enabled: true
+
+jaeger:
+  enabled: false
+
+kiali:
+  enabled: false
+
+clusterAuditor:
+  enabled: false
+
+gatekeeper:
+  enabled: false
+
+logging:
+  enabled: false
+
+eckoperator:
+  enabled: false
+
+fluentbit:
+  enabled: false
+
+monitoring:
+  enabled: false
+
+twistlock:
+  enabled: false
+
+sso:
+  oidc:
+    host: login.dso.mil
+    realm: baby-yoda
+  client_secret: ""
+
+addons:
+  vault:
+    enabled: true
+    git:
+      tag: null
+      branch: "14-make-token-claim-pvc-size-configurable"
+    ingress:
+      gateway: "passthrough"
+    values:
+      autoInit:
+        enabled: true
+      global:
+        tlsDisable: false
+      injector:
+        extraEnvironmentVars:
+          AGENT_INJECT_VAULT_ADDR: "https://vault.bigbang.dev"
+      server:
+        extraEnvironmentVars:
+          VAULT_API_ADDR: https://vault.bigbang.dev  #istio GW
+          VAULT_SKIP_VERIFY: "true"
+          VAULT_LOG_FORMAT: "json"
+          # VAULT_LICENSE: "xxxxxxxxx"
+        ha:
+          enabled: true
+          replicas: 1
+          raft:
+            enabled: true
+            config: |
+              ui = true
+              listener "tcp" {
+                tls_disable = false
+                address = "[::]:8200"
+                cluster_address = "[::]:8201"
+                tls_cert_file = "/vault/tls/tls.crt"
+                tls_key_file  = "/vault/tls/tls.key"
+                telemetry {
+                  unauthenticated_metrics_access = true
+                }
+              }
+              storage "raft" {
+                path = "/vault/data"
+              }
+              seal "awskms" {
+                region     = "us-gov-west-1"
+                kms_key_id = "17c01cdf-2bf9-4f58-9a54-c1c4e4b145be"
+                endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
+              }
+              telemetry {
+                prometheus_retention_time = "12h"
+                disable_hostname = true
+              }
+              service_registration "kubernetes" {}
